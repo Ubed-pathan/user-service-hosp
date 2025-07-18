@@ -1,3 +1,14 @@
 spring:
   application:
     name: user-service
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${USER_NAME}
+    password: ${PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+  server:
+    port: ${PORT}
