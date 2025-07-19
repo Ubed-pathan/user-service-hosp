@@ -5,6 +5,7 @@ import com.appointment.user_service.Entities.UserRegistrationEntity;
 import com.appointment.user_service.Repositories.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
     public void register(@Valid UserRegistrationDto dto) {
         if (userRepository.existsByUsername(dto.username())) {
@@ -25,7 +28,7 @@ public class UserService {
         entity.setLastName(dto.lastName());
         entity.setUsername(dto.username());
         entity.setEmail(dto.email());
-        entity.setPassword(dto.password()); // 🔐 Consider hashing the password
+        entity.setPassword(passwordEncoder.encode(dto.password()));
         entity.setAge(dto.age());
         entity.setPhoneNumber(dto.phoneNumber());
         entity.setAddress(dto.address());

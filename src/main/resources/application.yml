@@ -10,5 +10,6 @@ spring:
     hibernate:
       ddl-auto: update
     database: postgresql
-  server:
-    port: ${PORT}
+
+server:
+  port: ${PORT}
