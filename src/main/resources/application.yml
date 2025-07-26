@@ -13,6 +13,8 @@ spring:
 
 server:
   port: ${PORT}
+  servlet:
+    context-path: /user
 
 eureka:
   client:
