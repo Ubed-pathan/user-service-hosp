@@ -5,10 +5,7 @@ import com.appointment.user_service.Services.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping()
@@ -26,6 +23,17 @@ public class UserRegistrationController {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Something went wrong.");
+        }
+    }
+
+    @GetMapping("/exists/{userId}")
+    public ResponseEntity<?> isUserExist(@PathVariable String userId) {
+        try {
+            boolean exists = userService.isUserExists(userId);
+            return ResponseEntity.ok(exists);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Something went wrong: " + e.getMessage());
         }
     }
 }

@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -38,5 +40,13 @@ public class UserService {
         entity.setZipCode(dto.zipCode());
 
         userRepository.save(entity);
+    }
+
+    public boolean isUserExists(String userId) {
+        if (userId == null || userId.isEmpty()) {
+            throw new IllegalArgumentException("User ID cannot be null or empty.");
+        }
+        UUID uuid = UUID.fromString(userId);
+        return userRepository.existsById(uuid);
     }
 }
