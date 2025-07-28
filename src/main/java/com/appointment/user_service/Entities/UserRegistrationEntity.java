@@ -10,6 +10,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -62,6 +64,19 @@ public class UserRegistrationEntity {
     )
     @NotBlank
     String password;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private Set<Role> roles = new HashSet<>();
+
+    {
+        roles.add(Role.USER);
+    }
+
+    public enum Role {
+        USER,
+        ADMIN
+    }
 
     @Column(nullable = false)
     @Min(1)
@@ -122,7 +137,5 @@ public class UserRegistrationEntity {
     protected void onUpdate() {
         lastModified = LocalDateTime.now();
     }
-
-
 
 }
