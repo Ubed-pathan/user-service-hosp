@@ -19,7 +19,8 @@ target/
 *.iml
 *.ipr
 .env
-.pem
+*.pem
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
