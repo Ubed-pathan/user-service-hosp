@@ -4,6 +4,7 @@ import com.appointment.user_service.Entities.UserRegistrationEntity;
 import com.appointment.user_service.Repositories.UserRepository;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -17,14 +18,54 @@ public class AdminInitializer {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Value("${ADMIN_USERNAME}")
+    private String adminUsername;
+
+    @Value("${ADMIN_EMAIL}")
+    private String adminEmail;
+
+    @Value("${ADMIN_PASSWORD}")
+    private String adminPassword;
+
+    @Value("${ADMIN_FIRST_NAME}")
+    private String adminFirstName;
+
+    @Value("${ADMIN_MIDDLE_NAME}")
+    private String adminMiddleName;
+
+    @Value("${ADMIN_LAST_NAME}")
+    private String adminLastName;
+
+    @Value("${ADMIN_AGE}")
+    private String adminAge;
+
+    @Value("${ADMIN_PHONE}")
+    private String adminPhone;
+
+    @Value("${ADMIN_ADDRESS}")
+    private String adminAddress;
+
+    @Value("${ADMIN_CITY}")
+    private String adminCity;
+
+    @Value("${ADMIN_STATE}")
+    private String adminState;
+
+    @Value("${ADMIN_COUNTRY}")
+    private String adminCountry;
+
+    @Value("${ADMIN_ZIP}")
+    private String adminZip;
+
     @PostConstruct
     public void createAdminUserIfNotExists() {
-        String username = System.getenv("ADMIN_USERNAME");
-        String email = System.getenv("ADMIN_EMAIL");
-        String password = System.getenv("ADMIN_PASSWORD");
+        System.out.println(adminUsername);
+        String username = adminUsername;
+        String email = adminEmail;
+        String password = adminPassword;
 
         if (username == null || email == null || password == null) {
-            throw new RuntimeException("❌ Admin credentials not set in environment variables");
+            throw new RuntimeException("❌ Admin credentials not set in environment variables or properties");
         }
 
         Optional<UserRegistrationEntity> existingUserOpt = Optional.ofNullable(userRepository.findByUsername(username));
@@ -47,16 +88,16 @@ public class AdminInitializer {
         admin.setUsername(username);
         admin.setEmail(email);
         admin.setPassword(passwordEncoder.encode(password));
-        admin.setFirstName(System.getenv().getOrDefault("ADMIN_FIRST_NAME", "Admin"));
-        admin.setMiddleName(System.getenv().getOrDefault("ADMIN_MIDDLE_NAME", ""));
-        admin.setLastName(System.getenv().getOrDefault("ADMIN_LAST_NAME", "User"));
-        admin.setAge(Integer.parseInt(System.getenv().getOrDefault("ADMIN_AGE", "30")));
-        admin.setPhoneNumber(System.getenv().getOrDefault("ADMIN_PHONE", "1234567890"));
-        admin.setAddress(System.getenv().getOrDefault("ADMIN_ADDRESS", "Admin Address"));
-        admin.setCity(System.getenv().getOrDefault("ADMIN_CITY", "Admin City"));
-        admin.setState(System.getenv().getOrDefault("ADMIN_STATE", "Admin State"));
-        admin.setCountry(System.getenv().getOrDefault("ADMIN_COUNTRY", "Admin Country"));
-        admin.setZipCode(System.getenv().getOrDefault("ADMIN_ZIP", "123456"));
+        admin.setFirstName(adminFirstName);
+        admin.setMiddleName(adminMiddleName);
+        admin.setLastName(adminLastName);
+        admin.setAge(Integer.parseInt(adminAge));
+        admin.setPhoneNumber(adminPhone);
+        admin.setAddress(adminAddress);
+        admin.setCity(adminCity);
+        admin.setState(adminState);
+        admin.setCountry(adminCountry);
+        admin.setZipCode(adminZip);
         admin.setRoles(Set.of(UserRegistrationEntity.Role.ADMIN, UserRegistrationEntity.Role.USER));
 
         userRepository.save(admin);
