@@ -49,4 +49,7 @@ public class UserService {
         UUID uuid = UUID.fromString(userId);
         return userRepository.existsById(uuid);
     }
+
+    public String login(@Valid UserRegistrationDto userDto) {
+    }
 }

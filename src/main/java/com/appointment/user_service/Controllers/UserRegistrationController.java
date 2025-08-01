@@ -26,6 +26,17 @@ public class UserRegistrationController {
         }
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser(@RequestBody @Valid UserRegistrationDto userDto) {
+        try {
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/exists/{userId}")
     public ResponseEntity<?> isUserExist(@PathVariable String userId) {
         try {
