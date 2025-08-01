@@ -1,5 +1,7 @@
 package com.appointment.user_service.Services;
 
+import com.appointment.user_service.Config.JwtUtil;
+import com.appointment.user_service.Dtos.LoginDto;
 import com.appointment.user_service.Dtos.UserRegistrationDto;
 import com.appointment.user_service.Entities.UserRegistrationEntity;
 import com.appointment.user_service.Repositories.UserRepository;
@@ -8,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -17,6 +20,8 @@ public class UserService {
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final JwtUtil jwtUtil;
 
     public void register(@Valid UserRegistrationDto dto) {
         if (userRepository.existsByUsername(dto.username())) {
@@ -50,6 +55,25 @@ public class UserService {
         return userRepository.existsById(uuid);
     }
 
-    public String login(@Valid UserRegistrationDto userDto) {
+    public String login(LoginDto userDto) {
+        Optional<UserRegistrationEntity> optionalUser = Optional.ofNullable(userRepository.findByUsername(userDto.username()));
+
+        if (optionalUser.isEmpty()) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+
+        UserRegistrationEntity user = optionalUser.get();
+
+        if (!passwordEncoder.matches(userDto.password(), user.getPassword())) {
+            throw new IllegalArgumentException("Invalid username or password");
+        }
+
+        // Create and return JWT
+        return jwtUtil.generateToken(
+                user.getUsername(),
+                user.getId().toString(),
+                user.getEmail(),
+                "USER" // Replace with actual role if available
+        );
     }
 }

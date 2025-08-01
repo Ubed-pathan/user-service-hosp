@@ -3,6 +3,7 @@ package com.appointment.user_service.Config;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.security.KeyFactory;
@@ -16,12 +17,13 @@ import java.util.Map;
 @Component
 public class JwtUtil {
 
+    @Value("${JWT_PRIVATE_KEY}")
+    private String base64PrivateKey;
+
     private PrivateKey privateKey;
 
     @PostConstruct
     public void init() throws Exception {
-        String base64PrivateKey = System.getenv("PRIVATE_KEY"); // get from environment
-
         if (base64PrivateKey == null || base64PrivateKey.isEmpty()) {
             throw new IllegalStateException("PRIVATE_KEY environment variable is not set");
         }
