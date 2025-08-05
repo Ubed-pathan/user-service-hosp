@@ -1,14 +1,24 @@
 package com.appointment.user_service.Controllers;
 
+import com.appointment.user_service.Dtos.EmailForOtpDto;
 import com.appointment.user_service.Dtos.LoginDto;
 import com.appointment.user_service.Dtos.UserRegistrationDto;
+import com.appointment.user_service.Dtos.VerifyOtpDto;
+import com.appointment.user_service.Repositories.UserRepository;
+import com.appointment.user_service.Services.EmailService;
+import com.appointment.user_service.Services.OtpService;
 import com.appointment.user_service.Services.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequestMapping()
@@ -16,6 +26,38 @@ import org.springframework.web.bind.annotation.*;
 public class UserRegistrationController {
 
     private final UserService userService;
+    private final OtpService otpService;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
+
+    private final Set<String> verifiedEmails = new HashSet<>();
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<?> sendOtp(@RequestBody EmailForOtpDto req) {
+        String email = req.email();
+
+        if (userRepository.existsByEmail(email)) {
+            return ResponseEntity.badRequest().body("Email already registered.");
+        }
+
+        String otp = otpService.generateOtp(email);
+        emailService.sendOtp(email, otp);
+        return ResponseEntity.ok("OTP sent to email.");
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOtp(@RequestBody VerifyOtpDto req) {
+        String email = req.email();
+        String otp = req.email();
+
+        if (otpService.verifyOtp(email, otp)) {
+            verifiedEmails.add(email);
+            otpService.clearOtp(email);
+            return ResponseEntity.ok("OTP verified.");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid OTP");
+        }
+    }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegistrationDto userDto) {
