@@ -34,7 +34,6 @@ public class UserRegistrationController {
                                        HttpServletResponse response) {
         try {
             String jwtToken = userService.login(userDto);
-
             // Set token in HTTP-only cookie
             ResponseCookie cookie = ResponseCookie.from("jwt", jwtToken)
                     .httpOnly(true)
