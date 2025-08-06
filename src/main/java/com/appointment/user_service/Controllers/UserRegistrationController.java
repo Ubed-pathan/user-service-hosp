@@ -16,6 +16,7 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class UserRegistrationController {
     private final Set<String> verifiedEmails = new HashSet<>();
 
     @PostMapping("/send-otp")
-    public ResponseEntity<?> sendOtp(@RequestBody EmailForOtpDto req) {
+    public ResponseEntity<?> sendOtp(@Valid @RequestBody EmailForOtpDto req) throws IOException {
         String email = req.email();
 
         if (userRepository.existsByEmail(email)) {
@@ -46,13 +47,13 @@ public class UserRegistrationController {
     }
 
     @PostMapping("/verify-otp")
-    public ResponseEntity<?> verifyOtp(@RequestBody VerifyOtpDto req) {
+    public ResponseEntity<?> verifyOtp(@Valid @RequestBody VerifyOtpDto req) {
         String email = req.email();
         String otp = req.email();
 
         if (otpService.verifyOtp(email, otp)) {
             verifiedEmails.add(email);
-            otpService.clearOtp(email);
+//            otpService.clearOtp(email);
             return ResponseEntity.ok("OTP verified.");
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid OTP");
@@ -61,8 +62,15 @@ public class UserRegistrationController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody @Valid UserRegistrationDto userDto) {
+        String email = userDto.email();
+
+        if (!otpService.isEmailVerified(email)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email not verified. Please verify OTP before registering.");
+        }
+
         try {
-            userService.register(userDto); // Service does logic, throws error if needed
+            userService.register(userDto);
+            otpService.clearOtp(email); // Optional: clear after successful registration
             return ResponseEntity.ok("User registered successfully.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
