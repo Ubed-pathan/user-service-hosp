@@ -25,10 +25,8 @@ public class OtpService {
         OtpDetails otpDetails = otpStorage.get(email);
 
         if (otpDetails == null || otpDetails.isVerified()) {
-            // Create new OTP record
             otpDetails = new OtpDetails(otp, now, expiryTime, false);
         } else {
-            // Reset OTP data for unverified existing
             otpDetails.setOtp(otp);
             otpDetails.setGeneratedAt(now);
             otpDetails.setExpiresAt(expiryTime);
@@ -40,12 +38,15 @@ public class OtpService {
     }
 
     public boolean verifyOtp(String email, String inputOtp) {
+        System.out.println(otpStorage.toString());
         OtpDetails otpDetails = otpStorage.get(email);
 
-        if (otpDetails == null) return false;
+        if (otpDetails == null) {
+            return false;
+        }
 
         if (otpDetails.getExpiresAt().isBefore(LocalDateTime.now())) {
-            otpStorage.remove(email); // Optional: clear expired
+            otpStorage.remove(email);
             return false;
         }
 

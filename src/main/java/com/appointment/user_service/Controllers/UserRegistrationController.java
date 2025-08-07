@@ -49,7 +49,7 @@ public class UserRegistrationController {
     @PostMapping("/verify-otp")
     public ResponseEntity<?> verifyOtp(@Valid @RequestBody VerifyOtpDto req) {
         String email = req.email();
-        String otp = req.email();
+        String otp = req.otp();
 
         if (otpService.verifyOtp(email, otp)) {
             verifiedEmails.add(email);
