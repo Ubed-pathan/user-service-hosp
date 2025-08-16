@@ -3,6 +3,7 @@ package com.appointment.user_service.Services;
 import com.appointment.user_service.Config.JwtUtil;
 import com.appointment.user_service.Dtos.LoginDto;
 import com.appointment.user_service.Dtos.UserRegistrationDto;
+import com.appointment.user_service.Dtos.UserVerificationDto;
 import com.appointment.user_service.Entities.UserRegistrationEntity;
 import com.appointment.user_service.Repositories.UserRepository;
 import jakarta.validation.Valid;
@@ -47,12 +48,15 @@ public class UserService {
         userRepository.save(entity);
     }
 
-    public boolean isUserExists(String userId) {
-        if (userId == null || userId.isEmpty()) {
-            throw new IllegalArgumentException("User ID cannot be null or empty.");
+    public boolean isUserValid(UserVerificationDto dto) {
+        UUID uuid = UUID.fromString(dto.userId());
+        UserRegistrationEntity user  = userRepository.findById(uuid).orElse(null);
+
+        if(user == null) {
+            return false;
         }
-        UUID uuid = UUID.fromString(userId);
-        return userRepository.existsById(uuid);
+
+        return user.getEmail().equals(dto.usersEmail()) && (user.getFirstName() + " " + user.getMiddleName()+ " "+ user.getLastName()).equals(dto.usersFullName());
     }
 
     public String login(LoginDto userDto) {

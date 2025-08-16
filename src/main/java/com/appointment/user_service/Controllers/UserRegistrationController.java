@@ -1,9 +1,6 @@
 package com.appointment.user_service.Controllers;
 
-import com.appointment.user_service.Dtos.EmailForOtpDto;
-import com.appointment.user_service.Dtos.LoginDto;
-import com.appointment.user_service.Dtos.UserRegistrationDto;
-import com.appointment.user_service.Dtos.VerifyOtpDto;
+import com.appointment.user_service.Dtos.*;
 import com.appointment.user_service.Repositories.UserRepository;
 import com.appointment.user_service.Services.EmailService;
 import com.appointment.user_service.Services.OtpService;
@@ -101,10 +98,10 @@ public class UserRegistrationController {
     }
 
 
-    @GetMapping("/exists/{userId}")
-    public ResponseEntity<?> isUserExist(@PathVariable String userId) {
+    @PostMapping("/isValid")
+    public ResponseEntity<?> isUserValid(@Valid UserVerificationDto dto) {
         try {
-            boolean exists = userService.isUserExists(userId);
+            boolean exists = userService.isUserValid(dto);
             return ResponseEntity.ok(exists);
         } catch (Exception e) {
             e.printStackTrace();
