@@ -99,9 +99,9 @@ public class UserRegistrationController {
 
 
     @PostMapping("/isValid")
-    public ResponseEntity<?> isUserValid(@Valid UserVerificationDto dto) {
+    public ResponseEntity<?> isUserValid(@Valid @RequestBody UserVerificationDto dto) {
         try {
-            boolean exists = userService.isUserValid(dto);
+            UserVerificationDto exists = userService.isUserValid(dto);
             return ResponseEntity.ok(exists);
         } catch (Exception e) {
             e.printStackTrace();

@@ -48,15 +48,20 @@ public class UserService {
         userRepository.save(entity);
     }
 
-    public boolean isUserValid(UserVerificationDto dto) {
+    public UserVerificationDto isUserValid(UserVerificationDto dto) {
         UUID uuid = UUID.fromString(dto.userId());
-        UserRegistrationEntity user  = userRepository.findById(uuid).orElse(null);
+        UserRegistrationEntity user = userRepository.findById(uuid).orElse(null);
 
-        if(user == null) {
-            return false;
+        if (user == null) {
+            return new UserVerificationDto(null, null, null);
         }
 
-        return user.getEmail().equals(dto.usersEmail()) && (user.getFirstName() + " " + user.getMiddleName()+ " "+ user.getLastName()).equals(dto.usersFullName());
+        String fullName = user.getFirstName() + " " + user.getMiddleName() + " " + user.getLastName();
+        if (user.getEmail().equals(dto.usersEmail()) && fullName.equals(dto.usersFullName())) {
+            return new UserVerificationDto(user.getId().toString(), fullName, user.getEmail());
+        } else {
+            return new UserVerificationDto(null, null, null);
+        }
     }
 
     public String login(LoginDto userDto) {
