@@ -80,6 +80,7 @@ public class UserRegistrationController {
     public ResponseEntity<?> loginUser(@RequestBody @Valid LoginDto userDto,
                                        HttpServletResponse response) {
         try {
+            System.out.println("Login attempt for user: " + userDto.toString());
             String jwtToken = userService.login(userDto);
             // Set token in HTTP-only cookie
             ResponseCookie cookie = ResponseCookie.from("jwt", jwtToken)
