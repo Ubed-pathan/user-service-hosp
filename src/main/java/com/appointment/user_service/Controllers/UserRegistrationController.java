@@ -80,7 +80,6 @@ public class UserRegistrationController {
     public ResponseEntity<?> loginUser(@RequestBody @Valid LoginDto userDto,
                                        HttpServletResponse response) {
         try {
-            System.out.println("Login attempt for user: " + userDto.toString());
             String jwtToken = userService.login(userDto);
             // Set token in HTTP-only cookie
             ResponseCookie cookie = ResponseCookie.from("jwt", jwtToken)
@@ -92,7 +91,13 @@ public class UserRegistrationController {
 
             response.addHeader("Set-Cookie", cookie.toString());
 
-            return ResponseEntity.ok("Login successful");
+            UserDto userData = userService.getUserDetails(userDto.username());
+
+            if (userData == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+            }
+
+            return ResponseEntity.ok(userData);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body("error"+e.getMessage());
         }
@@ -109,5 +114,6 @@ public class UserRegistrationController {
             return ResponseEntity.internalServerError().body("Something went wrong: " + e.getMessage());
         }
     }
+
 }
 

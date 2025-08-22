@@ -2,6 +2,7 @@ package com.appointment.user_service.Services;
 
 import com.appointment.user_service.Config.JwtUtil;
 import com.appointment.user_service.Dtos.LoginDto;
+import com.appointment.user_service.Dtos.UserDto;
 import com.appointment.user_service.Dtos.UserRegistrationDto;
 import com.appointment.user_service.Dtos.UserVerificationDto;
 import com.appointment.user_service.Entities.UserRegistrationEntity;
@@ -83,6 +84,41 @@ public class UserService {
                 user.getId().toString(),
                 user.getEmail(),
                 "USER" // Replace with actual role if available
+        );
+    }
+
+    public UserDto getUserDetails(UUID userId) {
+
+
+        UserRegistrationEntity user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            return null; // or throw an exception
+        }
+
+        String fullName = user.getFirstName() + " " + user.getMiddleName() + " " + user.getLastName();
+
+        return new UserDto(
+                fullName,
+                user.getEmail(),
+                user.getUsername(),
+                user.getId().toString()
+        );
+    }
+
+    public UserDto getUserDetails(String userName) {
+        if (userName.isEmpty()) {
+            return null;
+        }
+
+        UserRegistrationEntity user = userRepository.findByUsername(userName);
+        String fullName = user.getFirstName() + " " + user.getMiddleName() + " " + user.getLastName();
+
+        return new UserDto(
+                fullName,
+                user.getEmail(),
+                user.getUsername(),
+                user.getId().toString()
         );
     }
 }
