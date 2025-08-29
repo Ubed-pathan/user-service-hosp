@@ -5,6 +5,5 @@ public record UserDto(
         String email,
         String username,
         String id
-) {
+){
 }
-
