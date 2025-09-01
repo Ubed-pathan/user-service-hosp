@@ -75,6 +75,7 @@ public class UserRegistrationEntity {
 
     public enum Role {
         USER,
+        DOCTOR,
         ADMIN
     }
 

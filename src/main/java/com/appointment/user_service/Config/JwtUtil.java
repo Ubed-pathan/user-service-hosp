@@ -1,5 +1,6 @@
 package com.appointment.user_service.Config;
 
+import com.appointment.user_service.Entities.UserRegistrationEntity;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.annotation.PostConstruct;
@@ -13,6 +14,7 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 @Component
 public class JwtUtil {
@@ -34,9 +36,10 @@ public class JwtUtil {
         privateKey = keyFactory.generatePrivate(keySpec);
     }
 
-    public String generateToken(String userName, String userId, String email, String role) {
+    public String generateToken(String userName, String userId, String email, Set<UserRegistrationEntity.Role> role) {
         Instant now = Instant.now();
-
+        // Convert roles to a list of strings
+        var roleNames = role.stream().map(Enum::name).toList();
         return Jwts.builder()
                 .setSubject(userId)
                 .setIssuer("user-service")
@@ -45,7 +48,7 @@ public class JwtUtil {
                 .addClaims(Map.of(
                         "userName", userName,
                         "email", email,
-                        "role", role
+                        "roles", roleNames
                 ))
                 .setHeaderParam("kid", "user-service-key") // Key ID for API Gateway
                 .signWith(privateKey, SignatureAlgorithm.RS256)

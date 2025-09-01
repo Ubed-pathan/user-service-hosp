@@ -27,8 +27,12 @@ public class UserFunctionsController {
 
         UUID uuid = UUID.fromString(userId);
         UserDto userDto = userServices.getUserDetails(uuid);
-
         return ResponseEntity.ok(userDto);
+    }
+
+    @GetMapping("/getAllUsers")
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.ok(userServices.getAllUsers());
     }
 
 }

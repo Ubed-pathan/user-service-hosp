@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -83,8 +84,8 @@ public class UserService {
                 user.getUsername(),
                 user.getId().toString(),
                 user.getEmail(),
-                "USER" // Replace with actual role if available
-        );
+                user.getRoles()
+            );
     }
 
     public UserDto getUserDetails(UUID userId) {
@@ -102,7 +103,9 @@ public class UserService {
                 fullName,
                 user.getEmail(),
                 user.getUsername(),
-                user.getId().toString()
+                user.getId().toString(),
+                user.getRoles(),
+                user.getPhoneNumber()
         );
     }
 
@@ -118,7 +121,49 @@ public class UserService {
                 fullName,
                 user.getEmail(),
                 user.getUsername(),
-                user.getId().toString()
+                user.getId().toString(),
+                user.getRoles(),
+                user.getPhoneNumber()
         );
+    }
+
+    public void registerDoctor(UserRegistrationDto dto) {
+        if (userRepository.existsByUsername(dto.username())) {
+            throw new IllegalArgumentException("Username already exists.");
+        }
+
+        UserRegistrationEntity entity = new UserRegistrationEntity();
+
+        entity.setFirstName(dto.firstName());
+        entity.setMiddleName(dto.middleName());
+        entity.setLastName(dto.lastName());
+        entity.setUsername(dto.username());
+        entity.setEmail(dto.email());
+        entity.setPassword(passwordEncoder.encode(dto.password()));
+        entity.getRoles().add(UserRegistrationEntity.Role.DOCTOR);         entity.setAge(dto.age());
+        entity.setPhoneNumber(dto.phoneNumber());
+        entity.setAddress(dto.address());
+        entity.setCity(dto.city());
+        entity.setState(dto.state());
+        entity.setCountry(dto.country());
+        entity.setZipCode(dto.zipCode());
+
+        userRepository.save(entity);
+    }
+
+    public List<UserDto> getAllUsers() {
+
+        List<UserRegistrationEntity> users = userRepository.findAll();
+        return users.stream().map(user -> {
+            String fullName = user.getFirstName() + " " + user.getMiddleName() + " " + user.getLastName();
+            return new UserDto(
+                    fullName,
+                    user.getEmail(),
+                    user.getUsername(),
+                    user.getId().toString(),
+                    user.getRoles(),
+                    user.getPhoneNumber()
+            );
+        }).toList();
     }
 }

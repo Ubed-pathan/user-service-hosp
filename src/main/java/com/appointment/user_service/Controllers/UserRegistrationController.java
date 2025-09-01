@@ -5,6 +5,7 @@ import com.appointment.user_service.Repositories.UserRepository;
 import com.appointment.user_service.Services.EmailService;
 import com.appointment.user_service.Services.OtpService;
 import com.appointment.user_service.Services.UserService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -76,6 +77,20 @@ public class UserRegistrationController {
         }
     }
 
+    @PostMapping("/register/doctor")
+    public ResponseEntity<?> registerDoctor(@RequestBody @Valid UserRegistrationDto userDto) {
+        String email = userDto.email();
+
+        try {
+            userService.registerDoctor(userDto);
+            return ResponseEntity.ok("User registered successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong.");
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody @Valid LoginDto userDto,
                                        HttpServletResponse response) {
@@ -113,6 +128,22 @@ public class UserRegistrationController {
             e.printStackTrace();
             return ResponseEntity.internalServerError().body("Something went wrong: " + e.getMessage());
         }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("jwt", null);
+        if(cookie == null){
+            return ResponseEntity.badRequest().body("Fail to log out");
+        }
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setMaxAge(0);
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Logged out successfully");
     }
 
 }
