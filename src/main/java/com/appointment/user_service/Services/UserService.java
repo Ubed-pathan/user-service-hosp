@@ -166,4 +166,12 @@ public class UserService {
             );
         }).toList();
     }
+
+    public void deleteUser(UUID uuid) {
+        if (userRepository.existsById(uuid)) {
+            userRepository.deleteById(uuid);
+        } else {
+            throw new IllegalArgumentException("User with ID " + uuid + " does not exist.");
+        }
+    }
 }

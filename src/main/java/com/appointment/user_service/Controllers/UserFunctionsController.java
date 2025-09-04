@@ -4,10 +4,7 @@ import com.appointment.user_service.Dtos.UserDto;
 import com.appointment.user_service.Services.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -33,6 +30,18 @@ public class UserFunctionsController {
     @GetMapping("/getAllUsers")
     public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userServices.getAllUsers());
+    }
+
+    @DeleteMapping("/deleteUser/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable("id") String id) {
+        try{
+            UUID uuid = UUID.fromString(id);
+            userServices.deleteUser(uuid);
+            return ResponseEntity.ok("User deleted successfully");
+        }
+        catch (Exception e){
+            return ResponseEntity.status(400).body("Invalid User ID");
+        }
     }
 
 }
