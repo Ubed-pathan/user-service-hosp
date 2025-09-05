@@ -198,6 +198,32 @@ public class UserService {
         }
     }
 
-//    public UserDto updateUser(UUID uuid, UserDto userDto) {
-//    }
+    public boolean updateUser(UUID uuid, UserDto userDto) {
+        try{
+            UserRegistrationEntity user = userRepository.findById(uuid).orElse(null);
+
+            if (user == null) {
+                throw new IllegalArgumentException("User with ID " + uuid + " does not exist.");
+            }
+
+            user.setFirstName(userDto.firstName());
+            user.setMiddleName(userDto.middleName());
+            user.setLastName(userDto.lastName());
+            user.setEmail(userDto.email());
+            user.setUsername(userDto.username());
+            user.setPhoneNumber(userDto.phoneNumber());
+            user.setAddress(userDto.address());
+            user.setCity(userDto.city());
+            user.setState(userDto.state());
+            user.setCountry(userDto.country());
+            user.setZipCode(userDto.zipCode());
+            user.setAge(userDto.age());
+            user.setGender(userDto.gender());
+            userRepository.save(user);
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
+    }
 }

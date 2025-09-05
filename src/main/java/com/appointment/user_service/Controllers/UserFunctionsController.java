@@ -44,16 +44,20 @@ public class UserFunctionsController {
         }
     }
 
-//    @PutMapping("/updateUser/{id}")
-//    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDto userDto) {
-//        try{
-//            UUID uuid = UUID.fromString(id);
-//            UserDto updatedUser = userServices.updateUser(uuid, userDto);
-//            return ResponseEntity.ok(updatedUser);
-//        }
-//        catch (Exception e){
-//            return ResponseEntity.status(400).body("Invalid User ID");
-//        }
-//    }
+    @PutMapping("/updateUser/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDto userDto) {
+        try{
+            UUID uuid = UUID.fromString(id);
+            boolean isUserUpdate = userServices.updateUser(uuid, userDto);
+            if(isUserUpdate){
+                return ResponseEntity.ok("User updated successfully");
+            } else {
+                return ResponseEntity.status(404).body("User not found");
+            }
+        }
+        catch (Exception e){
+            return ResponseEntity.status(400).body("Invalid User ID");
+        }
+    }
 
 }
