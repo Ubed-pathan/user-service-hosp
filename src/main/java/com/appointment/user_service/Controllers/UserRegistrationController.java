@@ -122,7 +122,9 @@ public class UserRegistrationController {
     @PostMapping("/isValid")
     public ResponseEntity<?> isUserValid(@Valid @RequestBody UserVerificationDto dto) {
         try {
+            System.out.println("Received user validation request: " + dto.toString());
             UserVerificationDto exists = userService.isUserValid(dto);
+            System.out.println("Validation result: " + exists.toString());
             return ResponseEntity.ok(exists);
         } catch (Exception e) {
             e.printStackTrace();
