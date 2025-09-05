@@ -84,6 +84,8 @@ public class UserRegistrationEntity {
     @Max(100)
     int age;
 
+    String gender;
+
     @Column(nullable = false, unique = true, length = 10)
     private String phoneNumber;
 

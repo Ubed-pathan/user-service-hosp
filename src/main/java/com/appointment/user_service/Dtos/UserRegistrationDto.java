@@ -28,6 +28,9 @@ public record UserRegistrationDto(
         @Max(value = 120, message = "Age must be at most 120")
         int age,
 
+        @NotBlank(message = "Gender cannot be blank")
+        String gender,
+
         @NotBlank(message = "Phone number cannot be blank")
         String phoneNumber,
 

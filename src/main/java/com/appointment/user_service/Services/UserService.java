@@ -97,15 +97,22 @@ public class UserService {
             return null; // or throw an exception
         }
 
-        String fullName = user.getFirstName() + " " + user.getMiddleName() + " " + user.getLastName();
-
         return new UserDto(
-                fullName,
+                user.getFirstName(),
+                user.getMiddleName(),
+                user.getLastName(),
                 user.getEmail(),
                 user.getUsername(),
                 user.getId().toString(),
                 user.getRoles(),
-                user.getPhoneNumber()
+                user.getPhoneNumber(),
+                user.getAddress(),
+                user.getCity(),
+                user.getState(),
+                user.getCountry(),
+                user.getZipCode(),
+                user.getAge(),
+                user.getGender()
         );
     }
 
@@ -115,15 +122,23 @@ public class UserService {
         }
 
         UserRegistrationEntity user = userRepository.findByUsername(userName);
-        String fullName = user.getFirstName() + " " + user.getMiddleName() + " " + user.getLastName();
 
         return new UserDto(
-                fullName,
+                user.getFirstName(),
+                user.getMiddleName(),
+                user.getLastName(),
                 user.getEmail(),
                 user.getUsername(),
                 user.getId().toString(),
                 user.getRoles(),
-                user.getPhoneNumber()
+                user.getPhoneNumber(),
+                user.getAddress(),
+                user.getCity(),
+                user.getState(),
+                user.getCountry(),
+                user.getZipCode(),
+                user.getAge(),
+                user.getGender()
         );
     }
 
@@ -155,14 +170,22 @@ public class UserService {
 
         List<UserRegistrationEntity> users = userRepository.findAll();
         return users.stream().map(user -> {
-            String fullName = user.getFirstName() + " " + user.getMiddleName() + " " + user.getLastName();
             return new UserDto(
-                    fullName,
+                    user.getFirstName(),
+                    user.getMiddleName(),
+                    user.getLastName(),
                     user.getEmail(),
                     user.getUsername(),
                     user.getId().toString(),
                     user.getRoles(),
-                    user.getPhoneNumber()
+                    user.getPhoneNumber(),
+                    user.getAddress(),
+                    user.getCity(),
+                    user.getState(),
+                    user.getCountry(),
+                    user.getZipCode(),
+                    user.getAge(),
+                    user.getGender()
             );
         }).toList();
     }
@@ -174,4 +197,7 @@ public class UserService {
             throw new IllegalArgumentException("User with ID " + uuid + " does not exist.");
         }
     }
+
+//    public UserDto updateUser(UUID uuid, UserDto userDto) {
+//    }
 }

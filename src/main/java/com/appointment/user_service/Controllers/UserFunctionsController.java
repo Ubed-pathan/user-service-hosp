@@ -44,4 +44,16 @@ public class UserFunctionsController {
         }
     }
 
+//    @PutMapping("/updateUser/{id}")
+//    public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDto userDto) {
+//        try{
+//            UUID uuid = UUID.fromString(id);
+//            UserDto updatedUser = userServices.updateUser(uuid, userDto);
+//            return ResponseEntity.ok(updatedUser);
+//        }
+//        catch (Exception e){
+//            return ResponseEntity.status(400).body("Invalid User ID");
+//        }
+//    }
+
 }
