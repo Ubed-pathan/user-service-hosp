@@ -209,8 +209,6 @@ public class UserService {
             user.setFirstName(userDto.firstName());
             user.setMiddleName(userDto.middleName());
             user.setLastName(userDto.lastName());
-            user.setEmail(userDto.email());
-            user.setUsername(userDto.username());
             user.setPhoneNumber(userDto.phoneNumber());
             user.setAddress(userDto.address());
             user.setCity(userDto.city());

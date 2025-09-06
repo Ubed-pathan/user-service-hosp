@@ -47,6 +47,7 @@ public class UserFunctionsController {
     @PutMapping("/updateUser/{id}")
     public ResponseEntity<?> updateUser(@PathVariable("id") String id, @RequestBody UserDto userDto) {
         try{
+            System.out.println(userDto.toString());
             UUID uuid = UUID.fromString(id);
             boolean isUserUpdate = userServices.updateUser(uuid, userDto);
             if(isUserUpdate){
