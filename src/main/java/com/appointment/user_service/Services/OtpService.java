@@ -38,7 +38,6 @@ public class OtpService {
     }
 
     public boolean verifyOtp(String email, String inputOtp) {
-        System.out.println(otpStorage.toString());
         OtpDetails otpDetails = otpStorage.get(email);
 
         if (otpDetails == null) {
@@ -85,7 +84,5 @@ public class OtpService {
                 iterator.remove(); // safe removal during iteration
             }
         }
-
-        System.out.println("OTP cleanup task executed at " + now);
     }
 }

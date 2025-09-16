@@ -146,5 +146,48 @@ public class UserRegistrationController {
         return ResponseEntity.ok("Logged out successfully");
     }
 
+
+    @PostMapping("/send-forget-otp")
+    public ResponseEntity<?> sendForgetOtp(@Valid @RequestBody EmailForOtpDto req) throws IOException {
+        String email = req.email();
+
+        if (!userRepository.existsByEmail(email)) {
+            return ResponseEntity.badRequest().body("User with this email does not exist.");
+        }
+
+        String otp = otpService.generateOtp(email);
+        emailService.sendOtp(email, otp);
+        return ResponseEntity.ok("OTP sent to email.");
+    }
+
+    @PostMapping("/forgot-password" )
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgetPasswordDto request) {
+        String password = request.password();
+        if (password == null || password.isEmpty()) {
+            return ResponseEntity.badRequest().body("Password cannot be empty.");
+        }
+
+        if (!userRepository.existsByEmail(request.email())) {
+            return ResponseEntity.badRequest().body("Email not found.");
+        }
+
+        boolean isUpdated = userService.updatePassword(request);
+
+
+        return ResponseEntity.ok("Password updated successfully.");
+    }
+
+    @PatchMapping("/change-password/{username}")
+    public ResponseEntity<?> changePassword(@PathVariable String username, @RequestBody @Valid ChangePasswordDto request) {
+        try {
+            userService.changePassword(username, request);
+            return ResponseEntity.ok("Password changed successfully.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Something went wrong: " + e.getMessage());
+        }
+    }
+
 }
 

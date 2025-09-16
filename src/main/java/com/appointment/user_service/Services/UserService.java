@@ -1,10 +1,7 @@
 package com.appointment.user_service.Services;
 
 import com.appointment.user_service.Config.JwtUtil;
-import com.appointment.user_service.Dtos.LoginDto;
-import com.appointment.user_service.Dtos.UserDto;
-import com.appointment.user_service.Dtos.UserRegistrationDto;
-import com.appointment.user_service.Dtos.UserVerificationDto;
+import com.appointment.user_service.Dtos.*;
 import com.appointment.user_service.Entities.UserRegistrationEntity;
 import com.appointment.user_service.Repositories.UserRepository;
 import jakarta.validation.Valid;
@@ -223,5 +220,35 @@ public class UserService {
         catch (Exception e){
             return false;
         }
+    }
+
+    public boolean updatePassword(@Valid ForgetPasswordDto request) {
+        try{
+            UserRegistrationEntity user = userRepository.findByEmail(request.email());
+            if (user == null) {
+                throw new IllegalArgumentException("User with email " + request.email() + " does not exist.");
+            }
+            user.setPassword(passwordEncoder.encode(request.password()));
+            userRepository.save(user);
+            return true;
+        }
+        catch (Exception e){
+            return false;
+        }
+    }
+
+    public void changePassword(String username, ChangePasswordDto request) {
+        UserRegistrationEntity user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new IllegalArgumentException("User with username " + username + " does not exist.");
+        }
+        if(passwordEncoder.matches(request.newPassword(), user.getPassword())){
+            throw new IllegalArgumentException("New password must be different from the old password.");
+        }
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("Old password is incorrect.");
+        }
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
     }
 }
