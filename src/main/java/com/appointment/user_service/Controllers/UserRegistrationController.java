@@ -1,10 +1,13 @@
 package com.appointment.user_service.Controllers;
 
 import com.appointment.user_service.Dtos.*;
+import com.appointment.user_service.Entities.UserRegistrationEntity;
+import com.appointment.user_service.Oauth.GoogleVerifier;
 import com.appointment.user_service.Repositories.UserRepository;
 import com.appointment.user_service.Services.EmailService;
 import com.appointment.user_service.Services.OtpService;
 import com.appointment.user_service.Services.UserService;
+import com.appointment.user_service.Config.JwtUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
@@ -28,6 +32,8 @@ public class UserRegistrationController {
     private final OtpService otpService;
     private final EmailService emailService;
     private final UserRepository userRepository;
+    private final GoogleVerifier googleVerifier;
+    private final JwtUtil jwtUtil;
 
     private final Set<String> verifiedEmails = new HashSet<>();
 
@@ -189,5 +195,91 @@ public class UserRegistrationController {
         }
     }
 
-}
+    @PostMapping("/auth/google")
+    public ResponseEntity<?> googleLogin(@RequestBody Map<String, String> payload,
+                                         HttpServletResponse response) {
+        String idToken = payload.get("idToken");
+        GoogleVerifier.GoogleUser googleUser = googleVerifier.verify(idToken);
 
+        if (googleUser == null) {
+            return ResponseEntity.status(401).body("Invalid Google token");
+        }
+
+        Optional<UserRegistrationEntity> existingUser = userRepository.findByEmail(googleUser.email());
+
+        if (existingUser.isPresent()) {
+            // Already registered → issue JWT
+            String jwt = jwtUtil.generateToken(
+                    existingUser.get().getUsername(),
+                    existingUser.get().getId().toString(),
+                    existingUser.get().getEmail(),
+                    existingUser.get().getRoles()
+            );
+
+            ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
+                    .httpOnly(true)
+                    .secure(true) // Set to true in production with HTTPS
+                    .path("/")
+                    .maxAge(3600 * 24 * 30)
+                    .build();
+
+            response.addHeader("Set-Cookie", cookie.toString());
+
+            UserDto userData = userService.getUserDetails(existingUser.get().getUsername());
+
+            if (userData == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+            }
+
+            return ResponseEntity.ok(userData);
+        }
+
+        // Not registered → require onboarding
+        return ResponseEntity.ok(Map.of(
+                "onboardingRequired", true,
+                "email", googleUser.email(),
+                "name", googleUser.name()
+        ));
+    }
+
+    @PostMapping("/auth/onboarding")
+    public ResponseEntity<?> completeOnboarding(@RequestBody UserRegistrationDto dto,
+                                                HttpServletResponse response) {
+        try {
+            if (userRepository.existsByEmail(dto.email())) {
+                return ResponseEntity.badRequest().body("Email already registered.");
+            }
+
+            userService.register(dto);
+            String jwt = jwtUtil.generateToken(
+                    dto.username(),
+                    userRepository.findByEmail(dto.email()).get().getId().toString(),
+                    dto.email(),
+                    userRepository.findByEmail(dto.email()).get().getRoles()
+            );
+
+            // Set token in HTTP-only cookie
+            ResponseCookie cookie = ResponseCookie.from("jwt", jwt)
+                    .httpOnly(true)
+                    .secure(true) // Set to true in production with HTTPS
+                    .path("/")
+                    .maxAge(3600 * 24 * 30)
+                    .build();
+
+            response.addHeader("Set-Cookie", cookie.toString());
+
+            UserDto userData = userService.getUserDetails(dto.username());
+
+            if (userData == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
+            }
+
+            return ResponseEntity.ok(userData);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Something went wrong: " + e.getMessage());
+        }
+    }
+}

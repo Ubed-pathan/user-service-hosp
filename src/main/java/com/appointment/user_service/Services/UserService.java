@@ -223,18 +223,11 @@ public class UserService {
     }
 
     public boolean updatePassword(@Valid ForgetPasswordDto request) {
-        try{
-            UserRegistrationEntity user = userRepository.findByEmail(request.email());
-            if (user == null) {
-                throw new IllegalArgumentException("User with email " + request.email() + " does not exist.");
-            }
-            user.setPassword(passwordEncoder.encode(request.password()));
-            userRepository.save(user);
-            return true;
-        }
-        catch (Exception e){
-            return false;
-        }
+        UserRegistrationEntity user = userRepository.findByEmail(request.email())
+                .orElseThrow(() -> new IllegalArgumentException("User with email " + request.email() + " does not exist."));
+        user.setPassword(passwordEncoder.encode(request.password()));
+        userRepository.save(user);
+        return true;
     }
 
     public void changePassword(String username, ChangePasswordDto request) {
