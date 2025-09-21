@@ -24,7 +24,8 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     public void register(@Valid UserRegistrationDto dto) {
-        if (userRepository.existsByUsername(dto.username())) {
+
+        if(userRepository.existsByUsername(dto.username())){
             throw new IllegalArgumentException("Username already exists.");
         }
 
