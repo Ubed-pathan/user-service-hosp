@@ -25,7 +25,8 @@ COPY --from=build /app/target/*.jar app.jar
 RUN apk add --no-cache bash
 
 # Expose the port from .env
-EXPOSE 1111
+#This port only for documentation purpose, actual port will be read from .env file
+EXPOSE 8000
 
 # Run the Spring Boot app with .env variables
-ENTRYPOINT ["bash", "-c", "set -a && [ -f /app/.env ] && source /app/.env; exec java -jar app.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
