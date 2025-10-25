@@ -2,7 +2,7 @@
     application:
       name: user-service
     datasource:
-      url: ${DATABASE_URL}
+      url: ${USER_DATABASE_URL}
       username: ${USER_NAME}
       password: ${PASSWORD}
       driver-class-name: org.postgresql.Driver
